@@ -1,0 +1,27 @@
+
+IMAGE?=juliojlgon/sas:18.0.0
+IMAGE_LATEST?=juliojlgon/sas:latest
+DUSER := $(shell id -u)
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+	DISPLAY := ${DISPLAY}
+endif
+ifeq ($(UNAME_S),Darwin)
+	DISPLAY := ${ip}:0
+endif
+
+pull:
+	docker pull $(IMAGE)
+	docker pull $(IMAGE_LATEST)
+
+notebook:
+	curl "https://gitlab.astro.unige.ch/ferrigno/sas-docker/-/raw/master/sas_docker.sh?inline=false" > sas_docker.sh
+	chmod +x sas_docker.sh
+	DISPLAY=$(DISPLAY) SAS_DOCKER_IMAGE=$(IMAGE) ./sas_docker.sh "jupyter notebook --ip 0.0.0.0 --no-browser --port=8880"
+
+shell:
+	curl "https://gitlab.astro.unige.ch/ferrigno/sas-docker/-/raw/master/sas_docker.sh?inline=false" > sas_docker.sh
+	chmod +x sas_docker.sh
+	DISPLAY=$(DISPLAY) SAS_DOCKER_IMAGE=$(IMAGE) ./sas_docker.sh "bash"
+
